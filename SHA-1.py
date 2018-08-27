@@ -1,4 +1,4 @@
-#
+# coding: utf-8
 #
 #
 #
@@ -33,9 +33,15 @@ class SHA1(object):
         elif isinstance(buffer, list):
             listOfBytes = buffer
 
+        # binarise
+        binary = "".join([format(hex_value, '0>8b') for hex_value in buffer])
+
+        # splitting every 512 bits
+        listOfBytes = [binary[i:i+512] for i in range(0, len(binary), 512)]
+
         # add padding
-        print(len(listOfBytes))
-        listOfBytes = self.addPadding(listOfBytes)
+        for i in range(len(listOfBytes)):
+            listOfBytes[i] = self.addPadding(listOfBytes[i])
 
         # parsed is a list of 32 bits block
         parsed = []
@@ -56,12 +62,30 @@ class SHA1(object):
         # so we must find the solution to this equation
         # adding a binary 1
         # solve k = 448 - (size(buffer) + 1)
+        # size(buffer) +  1 + k congru à 448 % 512
         # add k 0
         # add the size of message
-        if (len(buffer) % 512 != 0):
-            buffer.append(1)
+        #
+        # binarise using 8 bits big-endian adding 0 in front of odd object
+        # adding a leading one
+        binary += "1"
 
-        return buffer
+        # solving k in the equation  k = 448 - (size(buffer) + 1)
+        k = 448 - (len(binary) + 1) % 512
+        print("k = "+str(k))
+
+        # adding k zeros
+        padd_bin = ['0' for _ in range(k)]
+        binary += "".join(padd_bin)
+
+        # solving l as the original message length
+        l = format(len(buffer), '0>64b')
+        binary += l
+        print(l)
+
+        print(len(binary))
+
+        return binary
 
     @staticmethod
     def leftShift(bites):
