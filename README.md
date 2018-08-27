@@ -1,5 +1,5 @@
 # Secure-Hash
-Raymas & BoinBoin
+Raymas & BouinBouin
 
 ## Getting Started
 
